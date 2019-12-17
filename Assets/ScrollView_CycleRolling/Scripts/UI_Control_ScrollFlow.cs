@@ -19,7 +19,6 @@ public class UI_Control_ScrollFlow : MonoBehaviour, IBeginDragHandler, IDragHand
     private float StartValue = 0.5f;
     public float VMin = 0.1f, VMax = 0.9f;
 
-
     [Header("单边是多少,总数是乘以2+1,例m_count=3 总数 = 7")]
     [SerializeField]
     private int m_nCount;
@@ -31,9 +30,18 @@ public class UI_Control_ScrollFlow : MonoBehaviour, IBeginDragHandler, IDragHand
         }
     }
 
+    public GameObject ChildPrefab;
+    [Tooltip("设置的滚动的按钮数量必须要大于等于上面的nCount，否则效果会差")]
+    public int ChildCount;        
+
     private void Awake()
     {
         instance = this;
+    }
+
+    private void Start()
+    {
+       
     }
 
     /// <summary>
@@ -157,6 +165,23 @@ public class UI_Control_ScrollFlow : MonoBehaviour, IBeginDragHandler, IDragHand
         start_point = eventData.position;
         add_vect = Vector3.zero;
         _anim = false;
+    }
+
+    /// <summary>
+    /// 动态生成滚动按钮
+    /// </summary>
+    public void GenerateBtn()
+    {
+        for (int i = 0; i < ChildCount; i++)
+        {
+            GameObject temp = Instantiate(ChildPrefab);
+            temp.transform.SetParent(Rect.transform);
+            temp.transform.localScale = Vector3.one;
+            temp.transform.localEulerAngles = new Vector3(0, 0, 90);
+            temp.transform.GetComponent<RectTransform>().anchoredPosition3D = Vector3.zero;
+            temp.transform.Find("Text").GetComponent<Text>().text = (i + 1).ToString();
+        }
+        GetComponent<testrefsh>().enabled = true;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -386,6 +411,11 @@ public class UI_Control_ScrollFlow : MonoBehaviour, IBeginDragHandler, IDragHand
             {
                 if (MoveEnd != null) { MoveEnd(Current); }
             }
+        }
+
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            GenerateBtn();
         }
     }
 
